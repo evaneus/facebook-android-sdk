@@ -89,7 +89,7 @@ public final class Util {
 
     public static Bundle decodeUrl(String s) {
         Bundle params = new Bundle();
-        if (s != null) {
+        if (s != null && !s.equalsIgnoreCase("_")) {
             String array[] = s.split("&");
             for (String parameter : array) {
                 String v[] = parameter.split("=");

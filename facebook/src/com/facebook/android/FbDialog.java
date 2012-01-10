@@ -19,6 +19,7 @@ package com.facebook.android;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -29,6 +30,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebView;
@@ -71,6 +73,15 @@ public class FbDialog extends Dialog {
         mSpinner = new ProgressDialog(getContext());
         mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mSpinner.setMessage("Loading...");
+        mSpinner.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				 mWebView.stopLoading();
+				 mListener.onCancel();
+				 FbDialog.this.dismiss();				
+			}
+		});
 
         mContent = new LinearLayout(getContext());
         mContent.setOrientation(LinearLayout.VERTICAL);
@@ -90,10 +101,10 @@ public class FbDialog extends Dialog {
     }
 
     private void setUpTitle() {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE); 
         Drawable icon = getContext().getResources().getDrawable(
                 R.drawable.facebook_icon);
-        mTitle = new TextView(getContext());
+        mTitle = new TextView(getContext()); 
         mTitle.setText("Facebook");
         mTitle.setTextColor(Color.WHITE);
         mTitle.setTypeface(Typeface.DEFAULT_BOLD);
@@ -179,5 +190,16 @@ public class FbDialog extends Dialog {
             mSpinner.dismiss();
         }
 
+    }
+    
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+    	if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+    		mWebView.stopLoading();
+    		dismiss();
+    		mListener.onCancel();
+    		return true;
+    	}
+    	return super.onKeyUp(keyCode, event);
     }
 }
